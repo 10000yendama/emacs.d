@@ -63,8 +63,7 @@
   :init
   :config
   (setq skk-init-file (locate-user-emacs-file ".skk")
-        default-input-method "japanese-skk"
-        skk-cdb-large-jisyo (locate-user-emacs-file "skk-get-jisyo/SKK-JISYO.L.cdb")))
+        default-input-method "japanese-skk")
 (use-package diminish)
 (use-package flymake)
 (use-package htmlize)
