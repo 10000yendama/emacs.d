@@ -1,0 +1,8 @@
+syntax: regexp
+
+\.directory$
+^amx-items$
+^straight/
+^auto-save-list/
+~$
+#.*#$

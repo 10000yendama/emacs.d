@@ -1,0 +1,8 @@
+(setq skk-use-azik t)
+(setq skk-azik-keyboard-type 'jp106)
+(setq skk-rom-kana-rule-list
+      '(
+    ("(" nil "（")
+    (")" nil "）")))
+(setq skk-cdb-large-jisyo "/home/ryosuke/.emacs.d/skk-get-jisyo/SKK-JISYO.XL.cdb")
+(setq skk-inhibit-ja-dic-search t)
