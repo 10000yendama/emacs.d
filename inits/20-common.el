@@ -7,43 +7,54 @@
 (if (version<= "26.0.50" emacs-version)
     (global-display-line-numbers-mode))
 
+;; remove minor-mode indicator for specific modes
+(use-package diminish)
+
 ;; indentation settings for C source code
-(setq-default c-basic-offset 4
-              tab-width 4
-              indent-tabs-mode nil)
-(add-hook 'c-mode-common-hook '(lambda ()
-                                 (c-set-style "k&r")
-                                 ;; the default value for k&r is 5
-                                 (setq c-basic-offset 4) 
-                                 (show-paren-mode t)
-                                 (setq show-trailing-whitespace t)))
+(use-package cc-mode
+  :ensure nil
+  :config (setq c-default-style "k&r"
+		c-basic-offset 4
+                tab-width 4
+                indent-tabs-mode nil
+		show-trailing-whitespace t)
+  :hook (c-mode-common . (lambda ()
+                           (show-paren-mode t))))
 
-(require 'epa-file)
-(epa-file-enable)
+;; org-related packages
+(use-package epa
+  :ensure nil
+  :config (epa-file-enable))
 
-(require 'org-crypt)
-(org-crypt-use-before-save-magic)
-(setq org-tags-exclude-from-inheritance (quote ("crypt")))
-;; GPG key to use for encryption
-;; Either the Key ID or set to nil to use symmetric encryption.
-(setq org-crypt-key "D09D9078")
-
-;; sensitive-mode
 (require 'sensitive-mode)
-(add-to-list 'auto-mode-alist '("\\.org\\'" . sensitive-mode))
-(defun org-mode-hooks ()
-  (sensitive-mode)
-  (auto-fill-mode))
-(add-hook 'org-mode-hook 'org-mode-hooks)
 
-;; common packages
+(use-package org
+  :ensure nil
+  :hook (org-mode . (lambda ()
+		      (auto-fill-mode)
+		      (sensitive-mode)))
+  :config
+  (require 'org-crypt)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt"))
+	org-crypt-key "D09D9078")
+  (org-crypt-use-before-save-magic))
+
+;; help learn key combinations
 (use-package amx
   :config
   (amx-mode))
+
+;; LSP (language server protocol) related packages
+(use-package lsp-mode
+  :commands lsp
+  :init)
+(use-package lsp-ui :commands lsp-ui-mode)
 (use-package ccls
   :custom (ccls-executable "~/local/bin/ccls")
   :hook ((c-mode c++-mode objc-mode) .
          (lambda () (require 'ccls) (lsp))))
+
+;; completion
 (use-package company
   :init 
   :config
@@ -52,9 +63,18 @@
         company-selection-wrap-around t)
   (global-company-mode))
 (use-package company-lsp :commands company-lsp)
+
+;; better M-x, C-x b, C-x C-f, ...
+(use-package ivy
+  :diminish ivy-mode
+  :config (ivy-mode 1))
 (use-package counsel
   :diminish counsel-mode
   :config (counsel-mode 1))
+(use-package swiper
+  :bind (("C-s" . swiper)))
+
+;; input Japanese
 (use-package ddskk-autoloads
   :straight ddskk
   :bind (("C-x C-j" . skk-mode)
@@ -64,18 +84,9 @@
   :config
   (setq skk-init-file (locate-user-emacs-file ".skk")
         default-input-method "japanese-skk"))
-(use-package diminish)
+
 (use-package flymake)
 (use-package htmlize)
-(use-package ivy
-  :diminish ivy-mode
-  :config (ivy-mode 1))
-(use-package lsp-mode
-  :commands lsp
-  :init)
-(use-package lsp-ui :commands lsp-ui-mode)
-(use-package swiper
-  :bind (("C-s" . swiper)))
 (use-package tex
   :straight auctex)
 (use-package visual-regexp-steroids
