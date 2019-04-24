@@ -7,6 +7,9 @@
 (if (version<= "26.0.50" emacs-version)
     (global-display-line-numbers-mode))
 
+;; hide tool-bar
+(tool-bar-mode -1)
+
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
 
