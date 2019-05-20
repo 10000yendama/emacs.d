@@ -13,6 +13,11 @@
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
 
+(use-package asm-mode
+  :ensure nil
+  :hook (asm-mode . (lambda () (setq indent-tabs-mode nil
+				     tab-width 4))))
+
 ;; indentation settings for C source code
 (use-package cc-mode
   :ensure nil
@@ -92,11 +97,15 @@
 (use-package htmlize)
 (use-package tex
   :straight auctex)
-(use-package visual-regexp-steroids
+(use-package visual-regexp
+  :demand t
+  :commands (vr/query-replace vr/isearch-backward vr/isearch-forward)
   :bind (("M-%" . vr/query-replace)
          ("C-M-r" . vr/isearch-backward)
          ("C-M-s" . vr/isearch-forward))
   :config
+  (use-package visual-regexp-steroids
+    :demand)
   (setq vr/engine 'python))
 (use-package which-key
   :diminish which-key-mode
