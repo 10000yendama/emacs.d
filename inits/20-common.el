@@ -12,6 +12,13 @@
 
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
+(defmacro safe-diminish (file mode &optional new-name)
+  "https://github.com/larstvei/dot-emacs/blob/master/init.org"
+  `(with-eval-after-load ,file
+     (diminish ,mode ,new-name)))
+
+;; use safe-diminish only for non-use-package minor modes.
+(safe-diminish "eldoc" 'eldoc-mode)
 
 (use-package asm-mode
   :ensure nil
@@ -64,7 +71,8 @@
 
 ;; completion
 (use-package company
-  :init 
+  :init
+  :diminish company-mode
   :config
   (setq company-idle-delay 0
         company-minimum-prefix-length 2

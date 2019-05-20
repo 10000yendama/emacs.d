@@ -6,3 +6,4 @@
     (")" nil "）")))
 (setq skk-cdb-large-jisyo "/home/ryosuke/.emacs.d/skk-get-jisyo/SKK-JISYO.XL.cdb")
 (setq skk-inhibit-ja-dic-search t)
+(setq skk-indicator-use-cursor-color nil)

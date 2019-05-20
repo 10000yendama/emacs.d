@@ -14,7 +14,8 @@
 ;;   1) パッケージの設定は use-package の仕組みで行う
 ;;   2) Emacs標準機能の設定は分割したinitファイルで行う
 ;; ただし、customを使ったときにinit.elが荒れないように対策として書いておく。
-(setq custom-file (locate-user-emacs-file "custom.el")) 
+(setq custom-file (locate-user-emacs-file "custom.el"))
+(load custom-file)
 
 ;; パッケージマネージャ straight.el が無ければインストールする
 ;; Reference: https://github.com/raxod502/straight.el
