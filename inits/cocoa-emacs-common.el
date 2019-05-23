@@ -11,3 +11,6 @@
   (use-package color-theme-sanityinc-tomorrow
     :config
     (load-theme 'sanityinc-tomorrow-eighties t)))
+
+;; time locate (affects Org-mode)
+(setq system-time-locale "ja_JP.UTF-8")
