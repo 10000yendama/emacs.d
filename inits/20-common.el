@@ -48,6 +48,7 @@
   :hook (org-mode . (lambda ()
 		      (auto-fill-mode)
 		      (sensitive-mode)))
+  :bind (("S-<iso-lefttab>" . org-shifttab))
   :config
   (require 'org-crypt)
   (setq org-tags-exclude-from-inheritance (quote ("crypt"))
