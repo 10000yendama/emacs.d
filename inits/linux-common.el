@@ -11,3 +11,6 @@
   (use-package color-theme-sanityinc-tomorrow
     :config
     (load-theme 'sanityinc-tomorrow-eighties t)))
+
+;; use aspell for spell checking
+(setq ispell-program-name "aspell")
