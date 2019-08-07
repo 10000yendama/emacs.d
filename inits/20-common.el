@@ -81,6 +81,9 @@
   (global-company-mode))
 (use-package company-lsp :commands company-lsp)
 
+;; to prevent viperize ask every time Emacs launches
+(setq viper-mode nil)
+
 ;; better M-x, C-x b, C-x C-f, ...
 (use-package ivy
   :diminish ivy-mode
