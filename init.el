@@ -31,6 +31,7 @@
 ;; な.txtを開くとき、テキストエディタとしてemacsclientを使うよう関連付
 ;; けておく。すると、すでにそのマシンで起動しているemacsの新しいバッファ
 ;; として開くことができ、emacsを複数起動することを避けられる。
+(require 'server)
 (unless (server-running-p)
   (server-start))
 
