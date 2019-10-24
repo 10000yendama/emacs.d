@@ -10,6 +10,9 @@
 ;; hide tool-bar
 (tool-bar-mode -1)
 
+;; don't use tabs
+(setq-default indent-tabs-mode nil)
+
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
 (defmacro safe-diminish (file mode &optional new-name)
@@ -31,7 +34,6 @@
   :config (setq c-default-style "k&r"
 		c-basic-offset 4
                 tab-width 4
-                indent-tabs-mode nil
 		show-trailing-whitespace t)
   :hook (c-mode-common . (lambda ()
                            (show-paren-mode t))))
