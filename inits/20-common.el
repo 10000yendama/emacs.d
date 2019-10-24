@@ -107,7 +107,7 @@
   (setq skk-init-file (locate-user-emacs-file ".skk")
         default-input-method "japanese-skk"))
 
-;(use-package flymake)
+(use-package flymake)
 (use-package htmlize)
 (use-package tex
   :straight auctex)

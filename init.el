@@ -17,6 +17,24 @@
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (load custom-file)
 
+;; emacs のサーバーを起動。emacsclientコマンドでemacs serverを利用した
+;; 編集が可能になる。
+
+;; たとえば、emacsを常に起動している状況を考える。端末等で作業している
+;; とき、バージョン管理のコミットログとかで、emacsを使って編集しようと
+;; する。このとき、emacsをEDITORに指定すると、確かにemacsが起動するが、
+;; 別のemacsが新しく起動する。すでに起動しているのに。そこで
+;; emacsclientの出番。EDITOR=emacsclientとすると、すでにそのマシンで起
+;; 動しているemacsのバッファとして開いてくれる。編集を終了するときは
+;; C-x #とする。これでバッファが閉じられ、もとのコマンド（gitとか）に
+;; 結果が渡される。Windowsでもこれは有用。例えばエクスプローラで適当
+;; な.txtを開くとき、テキストエディタとしてemacsclientを使うよう関連付
+;; けておく。すると、すでにそのマシンで起動しているemacsの新しいバッファ
+;; として開くことができ、emacsを複数起動することを避けられる。
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
 ;; パッケージマネージャ straight.el が無ければインストールする
 ;; Reference: https://github.com/raxod502/straight.el
 (defvar bootstrap-version)
