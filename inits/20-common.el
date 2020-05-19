@@ -100,7 +100,7 @@
 (use-package ddskk-autoloads
   :straight ddskk
   :bind (("C-x C-j" . skk-mode)
-         ("C-x j" . skk-auto-fill-mode)
+         ("C-x j" . skk-mode)
          ("C-x t" . skk-turotial))
   :init
   :config
