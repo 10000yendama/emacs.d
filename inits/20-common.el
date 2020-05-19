@@ -124,3 +124,27 @@
 (use-package which-key
   :diminish which-key-mode
   :hook (after-init . which-key-mode))
+
+(defun timestamps-for-markdown ()
+  (interactive)
+  (org-element-map (org-element-parse-buffer) 'clock
+    (lambda (x)
+      (let* ((ts (org-element-property :value x))
+             (drawer (org-element-property :parent x))
+             (sec (org-element-property :parent drawer))
+             (hl (org-element-property :parent sec))
+             (title (org-element-property :raw-value hl))
+             (colon (lambda (s) (if s (concat (substring s 0 2) ":" (substring s 2 4)) "-")))
+             (pstart) (pend) (astart) (aend) (out))
+        (if (string-match "\\([0-9]\\{4\\}\\)?-\\([0-9]\\{4\\}\\)? \\(.+\\)" title)
+            (setq pstart (funcall colon (match-string 1 title))
+                  pend (funcall colon (match-string 2 title))
+                  title (match-string 3 title))
+          (setq pstart "-" pend "-" body title))
+        (setq astart (funcall colon (format "%02d%02d" (org-element-property :hour-start ts)
+                                            (org-element-property :minute-start ts)))
+              aend (funcall colon (format "%02d%02d" (org-element-property :hour-end ts)
+                                          (org-element-property :minute-end ts))))
+        (setq out (format "| %s | %s | %s | %s | %s |\n" pstart pend title astart aend))
+        (insert out)))))
+
