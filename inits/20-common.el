@@ -138,6 +138,10 @@
   :diminish which-key-mode
   :hook (after-init . which-key-mode))
 
+;; py-autopep8
+(use-package py-autopep8
+  :hook (python-mode . py-autopep8-enable-on-save))
+
 (defun timestamps-for-markdown ()
   (interactive)
   (org-element-map (org-element-parse-buffer) 'clock
