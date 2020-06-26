@@ -99,8 +99,8 @@
 ;; input Japanese
 (use-package ddskk-autoloads
   :straight ddskk
-  :bind (("C-x C-j" . skk-mode)
-         ("C-x j" . skk-mode)
+  :bind (("C-x C-j" . skk-auto-fill-mode)
+         ("C-x j" . skk-auto-fill-mode)
          ("C-x t" . skk-turotial))
   :init
   :config
