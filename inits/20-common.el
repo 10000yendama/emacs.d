@@ -13,6 +13,19 @@
 ;; don't use tabs
 (setq-default indent-tabs-mode nil)
 
+;; apply theme and customize modeline color
+(when (window-system)
+  ;; theme
+  (when (window-system)
+    (use-package color-theme-sanityinc-tomorrow
+      :config
+      (load-theme 'sanityinc-tomorrow-eighties t)))
+  (set-face-foreground 'mode-line "dim gray")
+  (set-face-background 'mode-line "goldenrod1")
+  (set-face-foreground 'mode-line-buffer-id "blue")
+  (set-face-foreground 'mode-line-inactive "#999999")
+  (set-face-background 'mode-line-inactive "#595959"))
+
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
 (defmacro safe-diminish (file mode &optional new-name)
