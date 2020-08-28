@@ -75,10 +75,20 @@
   :config
   (amx-mode))
 
+;; to find project root
+(use-package find-file-in-project)
+
 ;; LSP (language server protocol) related packages
+;; Install pyls via pipx to make it work
 (use-package lsp-mode
   :commands lsp
-  :init)
+  :init
+  :config
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+  (require 'lsp-pyls)
+  (setq lsp-pyls-plugins-pylint-enabled t)
+  (add-hook 'python-mode-hook 'lsp))
+
 (use-package lsp-ui :commands lsp-ui-mode)
 (use-package ccls
   :custom (ccls-executable "~/local/bin/ccls")
@@ -120,6 +130,7 @@
   (setq skk-init-file (locate-user-emacs-file ".skk")
         default-input-method "japanese-skk"))
 
+(use-package magit)
 (use-package flymake)
 (use-package htmlize)
 (use-package tex
@@ -139,8 +150,8 @@
   :hook (after-init . which-key-mode))
 
 ;; py-autopep8
-(use-package py-autopep8
-  :hook (python-mode . py-autopep8-enable-on-save))
+;; (use-package py-autopep8
+;;   :hook (python-mode . py-autopep8-enable-on-save))
 
 (defun timestamps-for-markdown ()
   (interactive)
