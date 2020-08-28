@@ -79,7 +79,12 @@
 (use-package find-file-in-project)
 
 ;; LSP (language server protocol) related packages
-;; Install pyls via pipx to make it work
+;; Install python-language-server[all] via pipx to make it work.
+;; Preferably inject the following packages
+;;      - black
+;;      - pyls-black
+;;      - pyls-isort (should be <5? cannot make it work :( )
+;;      - pyls-mypy
 (use-package lsp-mode
   :commands lsp
   :init
