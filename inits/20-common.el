@@ -1,6 +1,6 @@
 ;; common.el
 
-(keyboard-translate ?\C-h ?\C-?)
+(define-key key-translation-map [?\C-h] [?\C-?])
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
 
 ;; show line numbers if Emacs version >= 26
