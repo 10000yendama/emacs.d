@@ -76,7 +76,7 @@
   (amx-mode))
 
 ;; to find project root
-(use-package find-file-in-project)
+(use-package projectile)
 
 ;; LSP (language server protocol) related packages
 ;; Install python-language-server[all] via pipx to make it work.
