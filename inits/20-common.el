@@ -133,7 +133,12 @@
   :init
   :config
   (setq skk-init-file (locate-user-emacs-file ".skk")
-        default-input-method "japanese-skk"))
+        default-input-method "japanese-skk")
+  ;; dired-x uses C-x C-j by default
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (load "dired-x")
+              (global-set-key (kbd "C-x C-j") 'skk-auto-fill-mode))))
 
 (use-package magit)
 (use-package flymake)
