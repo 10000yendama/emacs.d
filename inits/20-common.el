@@ -13,6 +13,9 @@
 ;; don't use tabs
 (setq-default indent-tabs-mode nil)
 
+;; don't create lock files
+(setq create-lockfiles nil)
+
 ;; apply theme and customize modeline color
 (when (window-system)
   ;; theme
