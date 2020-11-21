@@ -186,3 +186,32 @@
         (setq out (format "| %s | %s | %s | %s | %s |\n" pstart pend title astart aend))
         (insert out)))))
 
+;; tide (TypeScript)
+(use-package tide
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
+  (setq typescript-indent-level 2)
+  :hook ((before-save . tide-format-before-save)
+         (typescript-mode . setup-tide-mode)))
+
+(use-package web-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  :config
+  ;; enable typescript-tslint checker
+  ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
+  :hook (web-mode . (lambda ()
+                      (setq web-mode-code-indent-offset 2
+                            web-mode-css-indent-offset 2
+                            web-mode-markup-indent-offset 2)
+                      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                        (setup-tide-mode)))))
