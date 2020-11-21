@@ -20,3 +20,7 @@
 
 ;; use aspell for spell checking
 (setq ispell-program-name "aspell")
+
+(use-package vterm
+  :ensure t
+  :config (setq vterm-max-scrollback 10000))
