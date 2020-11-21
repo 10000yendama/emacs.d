@@ -215,3 +215,6 @@
                             web-mode-markup-indent-offset 2)
                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
                         (setup-tide-mode)))))
+
+(use-package ace-window
+  :bind (("C-x o" . ace-window)))
