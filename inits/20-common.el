@@ -79,25 +79,44 @@
   (amx-mode))
 
 ;; to find project root
-(use-package projectile)
+(use-package projectile
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
+
+(use-package counsel-projectile
+  :after (counsel projectile)
+  :init (counsel-projectile-mode))
 
 ;; LSP (language server protocol) related packages
-;; Install python-language-server[all] via pipx to make it work.
-;; Preferably inject the following packages
-;;      - black
-;;      - pyls-black
-;;      - pyls-isort (should be <5? cannot make it work :( )
-;;      - pyls-mypy
+;; I use pyright for syntax and type checks,
+;; and pyls (via pyls-isort and pyls-black) for formatting.
+;; (pyright does not support formatting)
+;;
+;; Setup:
+;; 1) Install pyright via npm to make it work.
+;;   $ npm install -g pyright
+;; 2) Install pyls and its plugins.
+;;   $ pipx install python-language-server
+;;   $ pipx inject python-language-server pyls-isort pyls-black
+;;
+;; In order to enable both of pyright and pyls you have to edit
+;; lsp-pyright.el to add ":add-on? t" in the invocation of "make-lsp-client" 
+
 (use-package lsp-mode
   :commands lsp
-  :init
-  :config
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-  (require 'lsp-pyls)
-  (setq lsp-pyls-plugins-pylint-enabled t)
-  (add-hook 'python-mode-hook 'lsp))
-
+  :hook ((python-mode . (lambda ()
+                          ; (require 'lsp-pyls)
+                          (lsp)))
+         (lsp-after-open . lsp-enable-imenu)))
 (use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-pyright
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp)))
+  :config (setq lsp-pyright-typechecking-mode "strict"))
+
 (use-package ccls
   :custom (ccls-executable "~/local/bin/ccls")
   :hook ((c-mode c++-mode objc-mode) .
@@ -146,7 +165,9 @@
               (global-set-key (kbd "C-x C-j") 'skk-auto-fill-mode))))
 
 (use-package magit)
-(use-package flymake)
+(use-package flycheck
+  :hook (python-mode . (lambda ()
+                         (flycheck-mode))))
 (use-package htmlize)
 (use-package tex
   :straight auctex)
