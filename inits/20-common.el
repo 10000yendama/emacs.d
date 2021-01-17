@@ -123,7 +123,9 @@
   :config (ivy-mode 1))
 (use-package counsel
   :diminish counsel-mode
-  :config (counsel-mode 1))
+  :config
+  (counsel-mode 1)
+  (setf (alist-get 'counsel-M-x ivy-initial-inputs-alist) ""))
 (use-package swiper
   :bind (("C-s" . swiper)))
 
