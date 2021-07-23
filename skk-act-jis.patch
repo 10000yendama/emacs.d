@@ -872,7 +872,7 @@ index 51c70217..e43f6cfc 100644
  (defgroup skk-azik nil "SKK $B$G3HD%%m!<%^;zF~NO(B AZIK $B$r;H$&@_Dj(B"
    :prefix "skk-azik-"
    :group 'skk-input-enhanced)
-@@ -2697,6 +2701,22 @@ Emacs $B$N%*%j%8%J%k$NF0:n$G$O!"(B`self-insert-command' $B$K%P%$%s%I$5$l$?%-!
+@@ -2697,6 +2701,22 @@ Emacs $B$N%*%j%8%J%k$NF0:n$G$O!"(B`self-insert-command' $B$K%P%$%s%I$5$l$?%-(B!
    :type 'hook
    :group 'skk-act)
  
@@ -895,24 +895,6 @@ index 51c70217..e43f6cfc 100644
  ;; skk-azik.el related.
  (defcustom skk-use-azik nil
    "*Non-nil $B$G$"$l$P3HD%%m!<%^;zF~NO(B AZIK $B$rMxMQ$9$k!#(B"
- (defcustom skk-use-azik nil
-   "*Non-nil $B$G$"$l$P3HD%%m!<%^;zF~NO(B AZIK $B$rMxMQ$9$k!#(B"
-diff --git a/skk.el b/skk.el
-index b311c00a..34d31544 100644
---- a/skk.el
-+++ b/skk.el
-@@ -307,6 +307,9 @@ dependent."
-   (cond (skk-use-act
-          ;; $B3HD%%m!<%^;zF~NO(B ACT
-          (require 'skk-act))
-+        (skk-use-act-jp
-+	 ;; $B3HD%%m!<%^;zF~NO(B ACT (Dvorak JP)
-+	 (require 'skk-act-jp))
-         (skk-use-azik
-          ;; $B3HD%%m!<%^;zF~NO(B AZIK
-          (require 'skk-azik))
-
-
  (defcustom skk-use-azik nil
    "*Non-nil $B$G$"$l$P3HD%%m!<%^;zF~NO(B AZIK $B$rMxMQ$9$k!#(B"
 diff --git a/skk.el b/skk.el
