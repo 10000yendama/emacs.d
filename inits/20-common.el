@@ -159,7 +159,10 @@
   :config
   (use-package visual-regexp-steroids
     :demand)
-  (setq vr/engine 'python))
+  (setq vr/engine 'python)
+  (setq
+   vr/command-python
+   (replace-regexp-in-string "^python " "python3 " vr/command-python)))
 (use-package which-key
   :diminish which-key-mode
   :hook (after-init . which-key-mode))
