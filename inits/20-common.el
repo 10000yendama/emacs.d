@@ -78,9 +78,6 @@
   :config
   (amx-mode))
 
-;; to find project root
-(use-package projectile)
-
 ;; LSP (language server protocol) related packages
 ;; Install python-language-server[all] via pipx to make it work.
 ;; Preferably inject the following packages
@@ -97,7 +94,11 @@
   (setq lsp-pyls-plugins-pylint-enabled t)
   (add-hook 'python-mode-hook 'lsp))
 
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :config
+  (lsp-ui-sideline-enable nil))
+
 (use-package ccls
   :custom (ccls-executable "~/local/bin/ccls")
   :hook ((c-mode c++-mode objc-mode) .
@@ -129,6 +130,11 @@
 (use-package swiper
   :bind (("C-s" . swiper)))
 
+(use-package counsel-projectile
+  :config
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (counsel-projectile-mode +1))
+
 ;; input Japanese
 (use-package ddskk-autoloads
   :straight ddskk
@@ -145,7 +151,9 @@
               (load "dired-x")
               (global-set-key (kbd "C-x C-j") 'skk-auto-fill-mode))))
 
-(use-package magit)
+(use-package magit
+  :bind (("C-c g" . magit-status)))
+
 (use-package flymake)
 (use-package htmlize)
 (use-package tex
@@ -196,6 +204,8 @@
 
 ;; tide (TypeScript)
 (use-package tide
+  :init
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
   :config
   (defun setup-tide-mode ()
     (interactive)
