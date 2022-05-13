@@ -1,7 +1,6 @@
 (setq skk-use-act-jp t)
 (setq skk-rom-kana-rule-list
-      '(
-    ("(" nil "（")
+  '(("(" nil "（")
     (")" nil "）")))
 (setq skk-henkan-show-candidates-keys '(97 111 101 117 105 100 104 116 110 115 39 44 46 112 103 99 114 108 109 119 118))
 (setq skk-cdb-large-jisyo (concat user-emacs-directory "skk-get-jisyo/SKK-JISYO.XL.cdb"))
