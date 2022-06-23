@@ -2,7 +2,7 @@ new file mode 100644
 index 00000000..85db76d7
 --- /dev/null
 +++ b/skk-act-jp.el
-@@ -0,0 +1,854 @@
+@@ -0,0 +1,855 @@
 +;;; skk-act-jp.el --- 拡張ローマ字入力 "ACT" を SKK で使うための設定 -*- coding: iso-2022-jp -*-
 +
 +;; Copyright (C) 2003, 2007 IRIE Tetsuya <irie@t.email.ne.jp>
@@ -160,6 +160,7 @@ index 00000000..85db76d7
 +	   ("@h" nil "↓")
 +	   ("@t" nil "↑")
 +	   ("@n" nil "→")
++	   ("@" nil "@")
 +	   ;; か行は c を使う
 +	   ("ca" nil ("カ" . "か"))
 +	   ("ci" nil ("キ" . "き"))
