@@ -175,6 +175,8 @@
   :diminish which-key-mode
   :hook (after-init . which-key-mode))
 
+(use-package csv-mode)
+
 ;; py-autopep8
 ;; (use-package py-autopep8
 ;;   :hook (python-mode . py-autopep8-enable-on-save))
@@ -218,8 +220,7 @@
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
   (setq typescript-indent-level 2)
-  :hook ((before-save . tide-format-before-save)
-         (typescript-mode . setup-tide-mode)))
+  :hook ((typescript-mode . setup-tide-mode)))
 
 (use-package web-mode
   :init
@@ -227,6 +228,7 @@
   :config
   ;; enable typescript-tslint checker
   ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (setq web-mode-enable-auto-indentation nil)
   :hook (web-mode . (lambda ()
                       (setq web-mode-code-indent-offset 2
                             web-mode-css-indent-offset 2
