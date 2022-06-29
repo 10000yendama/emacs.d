@@ -16,6 +16,11 @@
 ;; don't create lock files
 (setq create-lockfiles nil)
 
+;; lsp-mode requires a lot of memory and produces garbage
+(setq gc-cons-threshold 100000000)
+;; lsp-mode reads large data from processes
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
 ;; apply theme and customize modeline color
 (when (window-system)
   ;; theme
@@ -78,24 +83,76 @@
   :config
   (amx-mode))
 
+;; Required by magit
+(use-package project)
+
+
+;; Python
+(defun common--get-python-project-root ()
+  (let ((path
+         (string-trim (shell-command-to-string "poetry env info -p"))))
+    (if (file-exists-p path)
+        path nil)))
+
+(use-package blacken
+  :hook (python-mode .
+                     (lambda ()
+                       (let ((path (common--get-python-project-root)))
+                         (when path
+                           (setq blacken-executable (format "%s/bin/black" path))
+                           (blacken-mode))))))
+
+(use-package python-isort
+  :init
+  (setq python-isort-arguments
+        '("--stdout"
+          "--atomic"
+          "--force-grid-wrap=0"
+          "--trailing-comma"
+          "--line-length=88"
+          "--multi-line=3"
+          "--use-parentheses"
+          "-"))
+  :hook (python-mode . (lambda ()
+                         (let ((path (common--get-python-project-root)))
+                           (when path
+                             (setq python-isort-command
+                                   (format "%s/bin/isort" path))))
+                         (python-isort-on-save-mode))))
+
+(use-package flycheck
+  :hook (python-mode . (lambda ()
+                         (let ((path (common--get-python-project-root)))
+                           (when path
+                             (setq flycheck-python-pylint-executable
+                                   (format "%s/bin/pylint" path)
+                                   flycheck-python-mypy-executable
+                                   (format "%s/bin/mypy" path))))
+                         (flycheck-mode))))
+
 ;; LSP (language server protocol) related packages
 
-;;   pipx install python-lsp-server[all]
-;;   pipx inject python-lsp-server pylsp-mypy pyls-isort python-lsp-black
 (use-package lsp-mode
   :commands lsp
   :init
-  :config
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-  (require 'lsp-pyls)
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (let ((path
-                     (string-trim (shell-command-to-string "poetry env info -p"))))
-                (when (file-exists-p path)
-                  (setq lsp-pylsp-plugins-jedi-environment path
-                        flycheck-python-pylint-executable (format "%s/bin/python" path))))
-              (lsp))))
+  (setq lsp-idle-delay 1)
+  :hook (lsp-after-open . lsp-enable-imenu))
+
+(use-package lsp-pyright
+  :ensure t
+  :init (setq lsp-file-watch-threshold 2000
+              lsp-pyright-typechecking-mode "basic")
+  :hook (python-mode . (lambda ()
+                         (flycheck-mode)
+                         (let ((path (common--get-python-project-root)))
+                           (if path
+                               (progn
+                                 (message (format "Loaded venv at %s." path))
+                                 (setq lsp-pyright-venv-path path))
+                             (message "No venv found.")))
+                         (lsp-diagnostics-lsp-checker-if-needed)
+                         (flycheck-add-next-checker 'lsp '(warning . python-pylint))
+                         (lsp))))
 
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
