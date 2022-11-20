@@ -157,7 +157,8 @@
 (use-package flymake)
 (use-package htmlize)
 (use-package tex
-  :straight auctex)
+  :straight auctex
+  :config (setq TeX-engine 'luatex))
 (use-package visual-regexp
   :demand t
   :commands (vr/query-replace vr/isearch-backward vr/isearch-forward)
@@ -236,3 +237,8 @@
 
 (use-package ace-window
   :bind (("C-x o" . ace-window)))
+
+(use-package proof-general)
+
+(use-package company-coq
+  :hook (coq-mode . company-coq-mode))
