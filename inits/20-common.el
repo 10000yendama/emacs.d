@@ -1,4 +1,4 @@
-;; common.el
+;; common.el  -*- lexical-binding: t; -*-
 
 (define-key key-translation-map [?\C-h] [?\C-?])
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
@@ -29,6 +29,12 @@
   (set-face-foreground 'mode-line-inactive "#999999")
   (set-face-background 'mode-line-inactive "#595959"))
 
+;; highlight whitespaces
+(setq whitespace-style '(face trailing indentation::space tab-mark missing-newline-at-eof))
+
+;; setup path correctly
+(use-package exec-path-from-shell)
+
 ;; remove minor-mode indicator for specific modes
 (use-package diminish)
 (defmacro safe-diminish (file mode &optional new-name)
@@ -42,15 +48,15 @@
 (use-package asm-mode
   :ensure nil
   :hook (asm-mode . (lambda () (setq indent-tabs-mode nil
-				     tab-width 4))))
+                                     tab-width 4))))
 
 ;; indentation settings for C source code
 (use-package cc-mode
   :ensure nil
   :config (setq c-default-style "k&r"
-		c-basic-offset 4
+                c-basic-offset 4
                 tab-width 4
-		show-trailing-whitespace t)
+                show-trailing-whitespace t)
   :hook (c-mode-common . (lambda ()
                            (show-paren-mode t))))
 
@@ -64,13 +70,13 @@
 (use-package org
   :ensure nil
   :hook (org-mode . (lambda ()
-		      (auto-fill-mode)
-		      (sensitive-mode)))
+                      (auto-fill-mode)
+                      (sensitive-mode)))
   :bind (("S-<iso-lefttab>" . org-shifttab))
   :config
   (require 'org-crypt)
   (setq org-tags-exclude-from-inheritance (quote ("crypt"))
-	org-crypt-key "D09D9078")
+        org-crypt-key "D09D9078")
   (org-crypt-use-before-save-magic))
 
 ;; help learn key combinations
@@ -83,36 +89,113 @@
   :config (yas-global-mode 1))
 (use-package yasnippet-snippets)
 
+;; Flymake
+(use-package flymake
+  :config
+  (require 'cspell-flymake)
+  (setq flymake-cspell-executable (executable-find "cspell"))
+  :hook
+  (prog-mode . (lambda ()
+                 (cspell-setup-flymake-backend)
+                 (flymake-mode))))
+
 ;; LSP (language server protocol) related packages
 
+;; Install pyright and make sure it is in PATH.
+;;   pipx install pyright
+;; Alternatively you can use pylsp. Install them using:
 ;;   pipx install python-lsp-server[all]
 ;;   pipx inject python-lsp-server pylsp-mypy pyls-isort python-lsp-black
-(use-package lsp-mode
-  :commands lsp
+
+(use-package eglot
+  :config
+  (require 'pylint-flymake)
+  :hook (eglot-managed-mode
+         . (lambda ()
+             (when (and (eglot-managed-p)
+                        (eq major-mode 'python-mode)
+                        (projectile-current-project-buffer-p)
+                        (projectile-project-root)
+                        (eq (projectile-project-type) 'python-poetry))
+               ;; Automatically setup required dir-local variables:
+               ;;   - flymake-pylint-executable :: required to enable pylint
+               ;;       backend. If missing pylint backend will fail and
+               ;;       become disabled.
+               ;;   - blacken-executable :: required to enable black (blacken).
+               ;;       If missing blacken-mode will not enabled.
+               ;;   - python-isort-command :: required to enable isort (python-isort).
+               ;;       If missing python-isort-on-save-mode will not enabled.
+               ;;   - elgot-workspace-configuration :: required to use
+               ;;       python executable in venv, instead of system-wide one.
+               ;;       Without setting up this correctly, import statements
+               ;;       will emit "Imports ... could not be resolved" errors.
+               ;;
+               ;; Automatic setup is only supported for poetry
+               ;; projects. For other types of Python projects, you can
+               ;; still set up these variables manually.
+               ;; (use M-x projectile-edit-dir-locals)
+               (let ((symbol (intern (projectile-project-root))))
+                 ;; Setup (this will only executed once for a project)
+                 (unless (assq symbol dir-locals-class-alist)
+                   (let* ((path
+                           (string-trim (shell-command-to-string "poetry env info -p")))
+                          (pylint-path (format "%s/bin/pylint" path))
+                          (black-path (format "%s/bin/black" path))
+                          (isort-path (format "%s/bin/isort" path))
+                          (dir-local-vars '()))
+                     (message (format "Automatically detected venv: %s" path))
+                     (when (file-executable-p pylint-path)
+                       (message "pylint found; added to dir-local vars ✨")
+                       (setf (alist-get 'flymake-pylint-executable dir-local-vars)
+                             pylint-path))
+                     (when (file-executable-p black-path)
+                       (message "black found; added to dir-local vars ✨")
+                       (setf (alist-get 'blacken-executable dir-local-vars)
+                             black-path))
+                     (when (file-executable-p isort-path)
+                       (message "isort found; added to dir-local vars ✨")
+                       (setf (alist-get 'python-isort-command dir-local-vars)
+                             isort-path))
+                     (setf (alist-get 'eglot-workspace-configuration dir-local-vars)
+                           `(:python (:analysis
+                                      (:typeCheckingMode "strict")
+                                      :pythonPath
+                                      ,(format "%s/bin/python" path))))
+                     (dir-locals-set-class-variables symbol
+                                                     `((python-mode . ,dir-local-vars))))
+                   (dir-locals-set-directory-class (projectile-project-root) symbol)
+
+                   ;; required to reload variables defined just now
+                   (hack-dir-local-variables-non-file-buffer))
+                 ;; Setup ends here
+
+                 ;; If black executable is found in the setup, enable it right now.
+                 (when (assq 'blacken-executable
+                             (assq 'python-mode
+                                   (assq symbol dir-locals-class-alist)))
+                   (blacken-mode 1))
+
+                 ;; If isort executable is found in the setup, enable it right now.
+                 (when (assq 'python-isort-command
+                             (assq 'python-mode
+                                   (assq symbol dir-locals-class-alist)))
+                   (python-isort-on-save-mode 1))
+
+                 ;; eglot removes all existing backends, so cspell backend
+                 ;; must be added again
+                 (cspell-setup-flymake-backend)
+
+                 ;; This will add pylint flymake backend.
+                 (pylint-setup-flymake-backend))))))
+
+(use-package blacken)
+(use-package python-isort
   :init
-  :config
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-  (require 'lsp-pyls)
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (let ((path
-                     (string-trim (shell-command-to-string "poetry env info -p"))))
-                (when (file-exists-p path)
-                  (setq lsp-pylsp-plugins-jedi-environment path
-                        flycheck-python-pylint-executable (format "%s/bin/python" path))))
-              (lsp))))
-
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-
-(use-package lsp-ui
-  :commands lsp-ui-mode
-  :config
-  (lsp-ui-sideline-enable nil))
-
-(use-package ccls
-  :custom (ccls-executable "~/local/bin/ccls")
-  :hook ((c-mode c++-mode objc-mode) .
-         (lambda () (require 'ccls) (lsp))))
+  (advice-add 'risky-local-variable-p
+              :around
+              (lambda (oldfun &rest r)
+                (cond ((eq (car r) 'python-isort-command) nil)
+                      ((apply oldfun r))))))
 
 ;; completion
 (use-package company
@@ -123,7 +206,6 @@
         company-minimum-prefix-length 2
         company-selection-wrap-around t)
   (global-company-mode))
-(use-package company-lsp :commands company-lsp)
 
 ;; to prevent viperize ask every time Emacs launches
 (setq viper-mode nil)
