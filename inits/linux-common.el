@@ -17,6 +17,8 @@
   (create-fontset-from-ascii-font "Ricty:pixelsize=20:weight=regular:slant=normal" nil "ricty")
   (set-fontset-font "fontset-ricty" 'unicode
                     "Ricty:weight=regular:slant=normal" nil 'append)
+  (set-fontset-font "fontset-ricty" '(#x1F000 . #x1F02B) ;; Mahjong tiles
+                    "FreeSerif:weight=regular:slant=normal")
   (add-to-list 'default-frame-alist '(font . "fontset-ricty")))
 
 ;; use aspell for spell checking
