@@ -78,6 +78,11 @@
   :config
   (amx-mode))
 
+;; yasnippet
+(use-package yasnippet
+  :config (yas-global-mode 1))
+(use-package yasnippet-snippets)
+
 ;; LSP (language server protocol) related packages
 
 ;;   pipx install python-lsp-server[all]
