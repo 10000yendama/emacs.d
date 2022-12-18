@@ -79,20 +79,25 @@
   (amx-mode))
 
 ;; LSP (language server protocol) related packages
-;; Install python-language-server[all] via pipx to make it work.
-;; Preferably inject the following packages
-;;      - black
-;;      - pyls-black
-;;      - pyls-isort (should be <5? cannot make it work :( )
-;;      - pyls-mypy
+
+;;   pipx install python-lsp-server[all]
+;;   pipx inject python-lsp-server pylsp-mypy pyls-isort python-lsp-black
 (use-package lsp-mode
   :commands lsp
   :init
   :config
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
   (require 'lsp-pyls)
-  (setq lsp-pyls-plugins-pylint-enabled t)
-  (add-hook 'python-mode-hook 'lsp))
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (let ((path
+                     (string-trim (shell-command-to-string "poetry env info -p"))))
+                (when (file-exists-p path)
+                  (setq lsp-pylsp-plugins-jedi-environment path
+                        flycheck-python-pylint-executable (format "%s/bin/python" path))))
+              (lsp))))
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-ui
   :commands lsp-ui-mode
