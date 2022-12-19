@@ -7,6 +7,9 @@
 (if (version<= "26.0.50" emacs-version)
     (global-display-line-numbers-mode))
 
+(if (version<= "28.1" emacs-version)
+    (global-display-fill-column-indicator-mode))
+
 ;; hide tool-bar
 (tool-bar-mode -1)
 
@@ -15,6 +18,9 @@
 
 ;; don't create lock files
 (setq create-lockfiles nil)
+
+;; nice
+(setq require-final-newline t)
 
 ;; lsp-mode requires a lot of memory and produces garbage
 (setq gc-cons-threshold 100000000)
@@ -88,6 +94,8 @@
 
 
 ;; Python
+(add-hook 'python-mode-hook (lambda () (setq fill-column 100)))
+
 (defun common--get-python-project-root ()
   (let ((path
          (string-trim (shell-command-to-string "poetry env info -p"))))
