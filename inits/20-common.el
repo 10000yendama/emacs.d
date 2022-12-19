@@ -305,7 +305,8 @@
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
   (setq typescript-indent-level 2)
-  :hook ((typescript-mode . setup-tide-mode)))
+  :hook ((before-save . tide-format-before-save)
+         (typescript-mode . setup-tide-mode)))
 
 (use-package web-mode
   :init
