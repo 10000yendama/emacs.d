@@ -225,7 +225,11 @@
               (global-set-key (kbd "C-x C-j") 'skk-auto-fill-mode))))
 
 (use-package magit
-  :bind (("C-c g" . magit-status)))
+  :bind (("C-c g" . magit-status))
+  :config
+  (setq magit-process-password-prompt-regexps
+        (cons (rx bol "パスフレーズを入力: " eol)
+              magit-process-password-prompt-regexps)))
 
 (use-package flymake)
 (use-package htmlize)

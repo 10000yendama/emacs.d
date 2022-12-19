@@ -8,9 +8,9 @@
 ;;
 ;; when window system available, use gtk version of pinentry.
 (unless (window-system)
-  (defun pinentry-emacs (desc prompt ok error)
-    (let ((str (read-passwd (concat (replace-regexp-in-string "%22" "\"" (replace-regexp-in-string "%0A" "\n" desc)) prompt ": "))))
-      str)))
+  (when (version<= "26" emacs-version)
+    (require 'epg)
+    (setq epg-pinentry-mode 'loopback)))
 
 ;; font
 (when (window-system)
