@@ -121,6 +121,16 @@
                          (python-isort-on-save-mode))))
 
 (use-package flycheck
+  :config
+  (flycheck-define-checker cspell
+    "Cspell checker supports camel case checking"
+    :command ("cspell" source-inplace)
+    :error-patterns
+    ((info line-start (file-name) ":" line ":" column " - "
+           (message)
+           line-end))
+    :modes (python-mode tide-mode))
+  (add-to-list 'flycheck-checkers 'cspell)
   :hook (python-mode . (lambda ()
                          (let ((path (common--get-python-project-root)))
                            (when path
@@ -135,8 +145,16 @@
 (use-package lsp-mode
   :commands lsp
   :init
-  (setq lsp-idle-delay 1)
+  (setq lsp-idle-delay 0.1)
   :hook (lsp-after-open . lsp-enable-imenu))
+
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :config
+  (lsp-ui-sideline-enable nil)
+  (flycheck-add-next-checker 'lsp '(t . cspell)))
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-pyright
   :ensure t
@@ -151,15 +169,8 @@
                                  (setq lsp-pyright-venv-path path))
                              (message "No venv found.")))
                          (lsp-diagnostics-lsp-checker-if-needed)
-                         (flycheck-add-next-checker 'lsp '(warning . python-pylint))
+                         (flycheck-add-next-checker 'lsp '(warning . python-pylint) t)
                          (lsp))))
-
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-
-(use-package lsp-ui
-  :commands lsp-ui-mode
-  :config
-  (lsp-ui-sideline-enable nil))
 
 (use-package ccls
   :custom (ccls-executable "~/local/bin/ccls")
@@ -171,7 +182,7 @@
   :init
   :diminish company-mode
   :config
-  (setq company-idle-delay 0
+  (setq company-idle-delay 0.1
         company-minimum-prefix-length 2
         company-selection-wrap-around t)
   (global-company-mode))
