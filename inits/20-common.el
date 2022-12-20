@@ -5,7 +5,7 @@
 
 ;; show line numbers if Emacs version >= 26
 (if (version<= "26.0.50" emacs-version)
-    (global-display-line-numbers-mode))
+    (global-display-line-numbers-mode +1))
 
 ;; hide tool-bar
 (tool-bar-mode -1)
@@ -31,6 +31,7 @@
 
 ;; highlight whitespaces
 (setq whitespace-style '(face trailing indentation::space tab-mark missing-newline-at-eof))
+(global-whitespace-mode +1)
 
 ;; setup path correctly
 (use-package exec-path-from-shell)
@@ -86,7 +87,7 @@
 
 ;; yasnippet
 (use-package yasnippet
-  :config (yas-global-mode 1))
+  :config (yas-global-mode +1))
 (use-package yasnippet-snippets)
 
 ;; prettier should be installed globally.
@@ -229,7 +230,7 @@
   (setq company-idle-delay 0
         company-minimum-prefix-length 2
         company-selection-wrap-around t)
-  (global-company-mode))
+  (global-company-mode +1))
 
 ;; to prevent viperize ask every time Emacs launches
 (setq viper-mode nil)
