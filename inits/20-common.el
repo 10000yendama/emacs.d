@@ -90,21 +90,6 @@
   :config (yas-global-mode +1))
 (use-package yasnippet-snippets)
 
-;; prettier should be installed globally.
-(use-package apheleia
-  :config
-  (push '(typescriptreact-mode . prettier-typescript) apheleia-mode-alist)
-  (apheleia-global-mode +1))
-
-(use-package typescript-mode
-  :mode ("\\.tsx\\'" . typescriptreact-mode)
-  :init
-  ;; Name of this mode should be one of the valid languageId listed
-  ;; below and "-mode" suffix. This way eglot and LSP server will
-  ;; be able to correctly recognize TSX files.
-  ;; https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentItem
-  (define-derived-mode typescriptreact-mode typescript-mode "typescriptreact"))
-
 ;; Flymake
 (use-package flymake
   :config
@@ -126,94 +111,85 @@
 (use-package eglot
   :config
   (require 'pylint-flymake)
-  (add-to-list 'eglot-server-programs
-               (cons 'typescriptreact-mode (list "typescript-language-server" "--stdio")))
-  :hook
-  ((eglot-managed-mode
-    . (lambda ()
-        (when (eglot-managed-p)
-          ;; eglot removes all existing backends, so cspell backend
-          ;; must be added again
-          (cspell-setup-flymake-backend))))
-   (eglot-managed-mode
-    . (lambda ()
-        (when (and (eglot-managed-p)
-                   (eq major-mode 'python-mode)
-                   (projectile-current-project-buffer-p)
-                   (projectile-project-root)
-                   (eq (projectile-project-type) 'python-poetry))
-          ;; Automatically setup required dir-local variables:
-          ;;   - flymake-pylint-executable :: required to enable pylint
-          ;;       backend. If missing pylint backend will fail and
-          ;;       become disabled.
-          ;;   - blacken-executable :: required to enable black (blacken).
-          ;;       If missing blacken-mode will not enabled.
-          ;;   - python-isort-command :: required to enable isort (python-isort).
-          ;;       If missing python-isort-on-save-mode will not enabled.
-          ;;   - elgot-workspace-configuration :: required to use
-          ;;       python executable in venv, instead of system-wide one.
-          ;;       Without setting up this correctly, import statements
-          ;;       will emit "Imports ... could not be resolved" errors.
-          ;;
-          ;; Automatic setup is only supported for poetry
-          ;; projects. For other types of Python projects, you can
-          ;; still set up these variables manually.
-          ;; (use M-x projectile-edit-dir-locals)
-          (let ((symbol (intern (projectile-project-root))))
-            ;; Setup (this will only executed once for a project)
-            (unless (assq symbol dir-locals-class-alist)
-              (let* ((path
-                      (string-trim (shell-command-to-string "poetry env info -p")))
-                     (pylint-path (format "%s/bin/pylint" path))
-                     (black-path (format "%s/bin/black" path))
-                     (isort-path (format "%s/bin/isort" path))
-                     (dir-local-vars '()))
-                (message (format "Automatically detected venv: %s" path))
-                (when (file-executable-p pylint-path)
-                  (message "pylint found; added to dir-local vars ✨")
-                  (setf (alist-get 'flymake-pylint-executable dir-local-vars)
-                        pylint-path))
-                ;; TODO: move to apheleia
-                (when (file-executable-p black-path)
-                  (message "black found; added to dir-local vars ✨")
-                  (setf (alist-get 'blacken-executable dir-local-vars)
-                        black-path))
-                ;; TODO: move to apheleia
-                (when (file-executable-p isort-path)
-                  (message "isort found; added to dir-local vars ✨")
-                  (setf (alist-get 'python-isort-command dir-local-vars)
-                        isort-path))
-                (setf (alist-get 'eglot-workspace-configuration dir-local-vars)
-                      `(:python (:analysis
-                                 (:typeCheckingMode "strict")
-                                 :pythonPath
-                                 ,(format "%s/bin/python" path))))
-                (dir-locals-set-class-variables symbol
-                                                `((python-mode . ,dir-local-vars))))
-              (dir-locals-set-directory-class (projectile-project-root) symbol)
+  :hook (eglot-managed-mode
+         . (lambda ()
+             (when (and (eglot-managed-p)
+                        (eq major-mode 'python-mode)
+                        (projectile-current-project-buffer-p)
+                        (projectile-project-root)
+                        (eq (projectile-project-type) 'python-poetry))
+               ;; Automatically setup required dir-local variables:
+               ;;   - flymake-pylint-executable :: required to enable pylint
+               ;;       backend. If missing pylint backend will fail and
+               ;;       become disabled.
+               ;;   - blacken-executable :: required to enable black (blacken).
+               ;;       If missing blacken-mode will not enabled.
+               ;;   - python-isort-command :: required to enable isort (python-isort).
+               ;;       If missing python-isort-on-save-mode will not enabled.
+               ;;   - elgot-workspace-configuration :: required to use
+               ;;       python executable in venv, instead of system-wide one.
+               ;;       Without setting up this correctly, import statements
+               ;;       will emit "Imports ... could not be resolved" errors.
+               ;;
+               ;; Automatic setup is only supported for poetry
+               ;; projects. For other types of Python projects, you can
+               ;; still set up these variables manually.
+               ;; (use M-x projectile-edit-dir-locals)
+               (let ((symbol (intern (projectile-project-root))))
+                 ;; Setup (this will only executed once for a project)
+                 (unless (assq symbol dir-locals-class-alist)
+                   (let* ((path
+                           (string-trim (shell-command-to-string "poetry env info -p")))
+                          (pylint-path (format "%s/bin/pylint" path))
+                          (black-path (format "%s/bin/black" path))
+                          (isort-path (format "%s/bin/isort" path))
+                          (dir-local-vars '()))
+                     (message (format "Automatically detected venv: %s" path))
+                     (when (file-executable-p pylint-path)
+                       (message "pylint found; added to dir-local vars ✨")
+                       (setf (alist-get 'flymake-pylint-executable dir-local-vars)
+                             pylint-path))
+                     (when (file-executable-p black-path)
+                       (message "black found; added to dir-local vars ✨")
+                       (setf (alist-get 'blacken-executable dir-local-vars)
+                             black-path))
+                     (when (file-executable-p isort-path)
+                       (message "isort found; added to dir-local vars ✨")
+                       (setf (alist-get 'python-isort-command dir-local-vars)
+                             isort-path))
+                     (setf (alist-get 'eglot-workspace-configuration dir-local-vars)
+                           `(:python (:analysis
+                                      (:typeCheckingMode "strict")
+                                      :pythonPath
+                                      ,(format "%s/bin/python" path))))
+                     (dir-locals-set-class-variables symbol
+                                                     `((python-mode . ,dir-local-vars))))
+                   (dir-locals-set-directory-class (projectile-project-root) symbol)
 
-              ;; required to reload variables defined just now
-              (hack-dir-local-variables-non-file-buffer))
-            ;; Setup ends here
+                   ;; required to reload variables defined just now
+                   (hack-dir-local-variables-non-file-buffer))
+                 ;; Setup ends here
 
-            ;; If black executable is found in the setup, enable it right now.
-            (when (assq 'blacken-executable
-                        (assq 'python-mode
-                              (assq symbol dir-locals-class-alist)))
-              (blacken-mode 1))
+                 ;; If black executable is found in the setup, enable it right now.
+                 (when (assq 'blacken-executable
+                             (assq 'python-mode
+                                   (assq symbol dir-locals-class-alist)))
+                   (blacken-mode 1))
 
-            ;; If isort executable is found in the setup, enable it right now.
-            (when (assq 'python-isort-command
-                        (assq 'python-mode
-                              (assq symbol dir-locals-class-alist)))
-              (python-isort-on-save-mode 1))
+                 ;; If isort executable is found in the setup, enable it right now.
+                 (when (assq 'python-isort-command
+                             (assq 'python-mode
+                                   (assq symbol dir-locals-class-alist)))
+                   (python-isort-on-save-mode 1))
 
-            ;; This will add pylint flymake backend.
-            (pylint-setup-flymake-backend)))))))
+                 ;; eglot removes all existing backends, so cspell backend
+                 ;; must be added again
+                 (cspell-setup-flymake-backend)
 
-;; TODO: move to apheleia
+                 ;; This will add pylint flymake backend.
+                 (pylint-setup-flymake-backend))))))
+
 (use-package blacken)
-;; TODO: move to apheleia
 (use-package python-isort
   :init
   (advice-add 'risky-local-variable-p
@@ -321,6 +297,38 @@
                                           (org-element-property :minute-end ts))))
         (setq out (format "| %s | %s | %s | %s | %s |\n" pstart pend title astart aend))
         (insert out)))))
+
+;; tide (TypeScript)
+(use-package tide
+  :init
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
+  (setq typescript-indent-level 2)
+  :hook ((typescript-mode . setup-tide-mode)))
+
+(use-package web-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  :config
+  ;; enable typescript-tslint checker
+  ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (setq web-mode-enable-auto-indentation nil)
+  :hook (web-mode . (lambda ()
+                      (setq web-mode-code-indent-offset 2
+                            web-mode-css-indent-offset 2
+                            web-mode-markup-indent-offset 2)
+                      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                        (setup-tide-mode)))))
 
 (use-package ace-window
   :bind (("C-x o" . ace-window)))
