@@ -303,8 +303,13 @@
   :init
   (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
   :config
+  (setq company-tooltip-align-annotations t
+        typescript-indent-level 2)
   (defun setup-tide-mode ()
     (interactive)
+    ;; reload dir-locals (required to set tide-tsserver-executable
+    ;; locally, which is required in yarn PnP environment)
+    (hack-dir-local-variables-non-file-buffer)
     (tide-setup)
     (flycheck-mode +1)
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
@@ -312,8 +317,6 @@
     (tide-hl-identifier-mode +1)
     (company-mode +1))
   ;; aligns annotation to the right hand side
-  (setq company-tooltip-align-annotations t)
-  (setq typescript-indent-level 2)
   :hook ((typescript-mode . setup-tide-mode)))
 
 (use-package web-mode
