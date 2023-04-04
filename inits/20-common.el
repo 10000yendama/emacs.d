@@ -93,12 +93,14 @@
 ;; Flymake
 (use-package flymake
   :config
-  (require 'cspell-flymake)
-  (setq flymake-cspell-executable (executable-find "cspell"))
+  ;; (require 'cspell-flymake)
+  ;; (setq flymake-cspell-executable (executable-find "cspell"))
   :hook
   (prog-mode . (lambda ()
-                 (cspell-setup-flymake-backend)
-                 (flymake-mode))))
+                 (unless (or (eq major-mode 'typescript-mode)
+                             (eq major-mode 'web-mode))
+                   ;; (cspell-setup-flymake-backend)
+                   (flymake-mode)))))
 
 ;; LSP (language server protocol) related packages
 
@@ -184,7 +186,7 @@
 
                  ;; eglot removes all existing backends, so cspell backend
                  ;; must be added again
-                 (cspell-setup-flymake-backend)
+                 ;; (cspell-setup-flymake-backend)
 
                  ;; This will add pylint flymake backend.
                  (pylint-setup-flymake-backend))))))
@@ -299,37 +301,43 @@
         (insert out)))))
 
 ;; tide (TypeScript)
+(defun setup-tide-mode ()
+  (interactive)
+  ;; reload dir-locals (required to set tide-tsserver-executable
+  ;; locally, which is required in yarn PnP environment)
+  (hack-dir-local-variables-non-file-buffer)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package typescript-mode
+  :ensure t
+  :hook (typescript-mode . setup-tide-mode))
+
 (use-package tide
-  :init
-  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  :ensure t
   :config
   (setq company-tooltip-align-annotations t
         typescript-indent-level 2)
-  (defun setup-tide-mode ()
-    (interactive)
-    ;; reload dir-locals (required to set tide-tsserver-executable
-    ;; locally, which is required in yarn PnP environment)
-    (hack-dir-local-variables-non-file-buffer)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-  ;; aligns annotation to the right hand side
-  :hook ((typescript-mode . setup-tide-mode)))
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . setup-tide-mode)
+         (before-save . tide-format-before-save)))
 
 (use-package web-mode
+  :ensure t
   :init
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-  :config
+  ;; :config
   ;; enable typescript-tslint checker
   ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (setq web-mode-enable-auto-indentation nil)
   :hook (web-mode . (lambda ()
                       (setq web-mode-code-indent-offset 2
                             web-mode-css-indent-offset 2
-                            web-mode-markup-indent-offset 2)
+                            web-mode-markup-indent-offset 2
+                            web-mode-enable-auto-indentation nil)
                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
                         (setup-tide-mode)))))
 
