@@ -14,6 +14,7 @@
 
 ;; font
 (when (window-system)
+  (exec-path-from-shell-initialize)
   (create-fontset-from-ascii-font "Ricty:pixelsize=20:weight=regular:slant=normal" nil "ricty")
   (set-fontset-font "fontset-ricty" 'unicode
                     "Ricty:weight=regular:slant=normal" nil 'append)
