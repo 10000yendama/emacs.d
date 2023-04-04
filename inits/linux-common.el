@@ -8,16 +8,16 @@
 ;;
 ;; when window system available, use gtk version of pinentry.
 (unless (window-system)
-  (defun pinentry-emacs (desc prompt ok error)
-    (let ((str (read-passwd (concat (replace-regexp-in-string "%22" "\"" (replace-regexp-in-string "%0A" "\n" desc)) prompt ": "))))
-      str)))
+  (when (version<= "26" emacs-version)
+    (require 'epg)
+    (setq epg-pinentry-mode 'loopback)))
 
 ;; font
 (when (window-system)
   (exec-path-from-shell-initialize)
-  (create-fontset-from-ascii-font "Ricty:pixelsize=20:weight=regular:slant=normal" nil "ricty")
+  (create-fontset-from-ascii-font "monospace:pixelsize=24:weight=regular:slant=normal" nil "ricty")
   (set-fontset-font "fontset-ricty" 'unicode
-                    "Ricty:weight=regular:slant=normal" nil 'append)
+                    "Cica:weight=regular:slant=normal" nil 'append)
   (set-fontset-font "fontset-ricty" '(#x1F000 . #x1F02B) ;; Mahjong tiles
                     "FreeSerif:weight=regular:slant=normal")
   (add-to-list 'default-frame-alist '(font . "fontset-ricty")))

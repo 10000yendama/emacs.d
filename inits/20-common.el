@@ -7,6 +7,9 @@
 (if (version<= "26.0.50" emacs-version)
     (global-display-line-numbers-mode +1))
 
+(if (version<= "28.1" emacs-version)
+    (global-display-fill-column-indicator-mode))
+
 ;; hide tool-bar
 (tool-bar-mode -1)
 
@@ -15,6 +18,9 @@
 
 ;; don't create lock files
 (setq create-lockfiles nil)
+
+;; nice
+(setq require-final-newline t)
 
 ;; apply theme and customize modeline color
 (when (window-system)
@@ -225,6 +231,12 @@
 (use-package swiper
   :bind (("C-s" . swiper)))
 
+(use-package projectile
+  :config
+  (projectile-update-project-type
+   'python-poetry
+   :precedence 'high))
+
 (use-package counsel-projectile
   :config
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
@@ -247,7 +259,11 @@
               (global-set-key (kbd "C-x C-j") 'skk-auto-fill-mode))))
 
 (use-package magit
-  :bind (("C-c g" . magit-status)))
+  :bind (("C-c g" . magit-status))
+  :config
+  (setq magit-process-password-prompt-regexps
+        (cons (rx bol "パスフレーズを入力: " eol)
+              magit-process-password-prompt-regexps)))
 
 (use-package flymake)
 (use-package htmlize)
@@ -299,6 +315,9 @@
                                           (org-element-property :minute-end ts))))
         (setq out (format "| %s | %s | %s | %s | %s |\n" pstart pend title astart aend))
         (insert out)))))
+
+;; YAML
+(use-package yaml-mode)
 
 ;; tide (TypeScript)
 (defun setup-tide-mode ()
