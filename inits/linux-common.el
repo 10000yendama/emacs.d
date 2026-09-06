@@ -16,7 +16,8 @@
   (set-fontset-font "fontset-ricty" 'symbol "Noto Sans Symbols" nil 'append)
   (set-fontset-font "fontset-ricty" '(#x1F000 . #x1F02B) ;; Mahjong tiles
                     "FreeSerif:weight=regular:slant=normal")
-  (add-to-list 'default-frame-alist '(font . "fontset-ricty")))
+  (add-to-list 'default-frame-alist '(font . "fontset-ricty"))
+  (setq text-scale-mode-step 1.25))
 
 ;; use aspell for spell checking
 (setq ispell-program-name "aspell")
