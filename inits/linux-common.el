@@ -1,9 +1,11 @@
 ;; linux-common.el
 
+(when initial-window-system
+  (add-hook 'after-init-hook #'init-fontset))
+
 ;; font
-(when (window-system)
-  (exec-path-from-shell-initialize)
-  (create-fontset-from-ascii-font "PlemolJP:weight=regular:slant=normal" nil "ricty")
+(defun init-fontset (&optional size frame)
+  (create-fontset-from-ascii-font "PlemolJP-11:weight=regular:slant=normal" nil "ricty")
   (set-fontset-font "fontset-ricty" 'unicode
                     "PlemolJP:weight=regular:slant=normal" nil 'append)
   ;; Set fonts for symbols
