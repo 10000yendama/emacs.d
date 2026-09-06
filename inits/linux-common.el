@@ -21,14 +21,6 @@
 ;; use aspell for spell checking
 (setq ispell-program-name "aspell")
 
-(use-package read-aloud
-  :straight nil
-  :config
-  (setq read-aloud-engines
-        '("voicevox"
-          (cmd "bash" args ("~/.local/bin/voicevox_wrapper.sh"))))
-  (setq read-aloud-engine "voicevox"))
-
 (when (getenv "WSLENV")
   (if (or (null (executable-find "wl-copy"))
           (null (executable-find "wl-paste")))
